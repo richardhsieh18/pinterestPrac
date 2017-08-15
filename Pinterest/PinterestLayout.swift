@@ -15,6 +15,29 @@ protocol PinterestLayoutDelegate {
   func collectionView(collectionView: UICollectionView, heightForAnnotationAtIndexPath indexPath: NSIndexPath, withWidth width: CGFloat) -> CGFloat
 }
 
+class PinterestLayoutAttributes: UICollectionViewLayoutAttributes {
+  
+  // 1
+  var photoHeight: CGFloat = 0.0
+  
+  // 2
+  override func copy(with zone: NSZone?) -> Any {
+    let copy = super.copy(with: zone) as! PinterestLayoutAttributes
+    copy.photoHeight = photoHeight
+    return copy
+  }
+  
+  // 3
+//  override func isEqual(object: AnyObject?) -> Bool {
+//    if let attributes = object as? PinterestLayoutAttributes {
+//      if( attributes.photoHeight == photoHeight  ) {
+//        return super.isEqual(object)
+//      }
+//    }
+//    return false
+//  }
+}
+
 class PinterestLayout: UICollectionViewLayout
 {
   var delegate: PinterestLayoutDelegate!
@@ -22,7 +45,7 @@ class PinterestLayout: UICollectionViewLayout
   var numberOfColumns = 2
   var cellPadding: CGFloat = 6.0
   
-  private var cache = [UICollectionViewLayoutAttributes]()
+  private var cache = [PinterestLayoutAttributes]()
   
   private var contentHeight: CGFloat = 0.0
   private var contentWidth: CGFloat {
@@ -54,7 +77,8 @@ class PinterestLayout: UICollectionViewLayout
         //改寫 let insetFrame = CGRectInset(frame, cellPadding, cellPadding)
         let insetFrame = frame.insetBy(dx: cellPadding, dy: cellPadding)
         
-        let attributes = UICollectionViewLayoutAttributes(forCellWith: indexPath as IndexPath)
+        let attributes = PinterestLayoutAttributes(forCellWith: indexPath as IndexPath)
+        attributes.photoHeight = photoHeight
         attributes.frame = insetFrame
         cache.append(attributes)
         
@@ -81,5 +105,13 @@ class PinterestLayout: UICollectionViewLayout
     return layoutAttributes
   }
   
+// 改寫成下面
+//  override class func layoutAttributesClass() -> AnyClass {
+//    return PinterestLayoutAttributes.self
+//  }
+  
+  override class var layoutAttributesClass : AnyClass {
+    return PinterestLayoutAttributes.self
+  }
   
 }

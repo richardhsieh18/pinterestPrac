@@ -25,7 +25,7 @@ class PinterestLayout: UICollectionViewLayout
   private var cache = [UICollectionViewLayoutAttributes]()
   
   private var contentHeight: CGFloat = 0.0
-  private var contecntWidth: CGFloat {
+  private var contentWidth: CGFloat {
     let insets = collectionView!.contentInset
     return collectionView!.bounds.width - (insets.left + insets.right)
   }
@@ -33,10 +33,10 @@ class PinterestLayout: UICollectionViewLayout
   override func prepare()
   {
     if cache.isEmpty{
-      let columnWidth = contecntWidth / CGFloat(numberOfColumns)
+      let columnWidth = contentWidth / CGFloat(numberOfColumns)
       var xOffset = [CGFloat]()
       for column in 0 ..< numberOfColumns {
-        xOffset.append(CGFloat(column) * contecntWidth)
+        xOffset.append(CGFloat(column) * columnWidth)
       }
       var column = 0
       //改寫 var yOffset = [CGFloat](count: numberOfColumns, repeatedValue: 0)
@@ -50,7 +50,7 @@ class PinterestLayout: UICollectionViewLayout
         let photoHeight = delegate.collectionView(collectionView: collectionView!, heightForPhotoAtIndexPath: indexPath, withWidth: width)
         let annotationHeight = delegate.collectionView(collectionView: collectionView!, heightForAnnotationAtIndexPath: indexPath, withWidth: width)
         let height = cellPadding + photoHeight + annotationHeight + cellPadding
-        let frame = CGRect(x: xOffset[column], y: xOffset[column], width: columnWidth, height: height)
+        let frame = CGRect(x: xOffset[column], y: yOffset[column], width: columnWidth, height: height)
         //改寫 let insetFrame = CGRectInset(frame, cellPadding, cellPadding)
         let insetFrame = frame.insetBy(dx: cellPadding, dy: cellPadding)
         
@@ -60,13 +60,14 @@ class PinterestLayout: UICollectionViewLayout
         
         contentHeight = max(contentHeight, frame.maxY)
         yOffset[column] = yOffset[column] + height
+        print(yOffset[column])
         column = column >= (numberOfColumns - 1) ? 0 : column + 1
       }
     }
   }
   
   override var collectionViewContentSize: CGSize {
-    return CGSize(width: contecntWidth, height: contentHeight)
+    return CGSize(width: contentWidth, height: contentHeight)
   }
   
   override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
